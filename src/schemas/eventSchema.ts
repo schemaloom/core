@@ -10,8 +10,6 @@ const EventSchema = z.object({
 })
 
 // Array of events - this works with Gemini arrays
-const EventListSchema = z.object({
-  events: z.array(EventSchema)
-})
+const EventListSchema = z.array(EventSchema)
 
 export default EventListSchema
