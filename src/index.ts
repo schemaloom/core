@@ -1,6 +1,9 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import extract from './api/routes/extract.ts';
+import extract from './api/routes/extract.js';
+import { configDotenv } from 'dotenv';
+
+configDotenv();
 
 const app = new Hono()
 
@@ -9,6 +12,7 @@ app.get('/', (c) => {
 })
 
 app.route("/extract", extract)
+
 
 serve({
   fetch: app.fetch,
