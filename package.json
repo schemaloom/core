@@ -1,15 +1,37 @@
 {
-  "name": "core",
+  "name": "schemaloom",
+  "version": "1.0.0",
+  "description": "A TypeScript library for AI-powered data extraction and schema validation with built-in web server",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
     "@langchain/core": "^0.3.72",
     "@langchain/google-genai": "^0.2.16",
+    "@langchain/textsplitters": "^0.0.1",
     "dotenv": "^17.2.1",
     "hono": "^4.9.4",
     "langchain": "^0.3.31",
@@ -19,5 +41,22 @@
     "@types/node": "^20.11.17",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
+  },
+  "keywords": [
+    "typescript",
+    "ai",
+    "extraction",
+    "schema",
+    "validation",
+    "langchain",
+    "gemini",
+    "web-server",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
   }
 }

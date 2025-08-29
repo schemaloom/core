@@ -1,22 +1,16 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
-import extract from './api/routes/extract.js';
-import { configDotenv } from 'dotenv';
+// Core extraction functionality
+export { default as Extractor } from './extraction/extractor.js';
+export { default as GeminiProvider } from './extraction/providers/gemini.js';
 
-configDotenv();
+// Schemas
+export { default as EventListSchema } from './schemas/eventSchema.js';
+export * from './schemas/index.js';
 
-const app = new Hono()
+// Main extraction class
+export { SchemaLoomExtractor } from './extraction/schemaLoomExtractor.js';
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+// Types
+export type { ExtractionOptions, ExtractionResult, TextChunk, ExtractionProvider, ServerOptions } from './types/index.js';
 
-app.route("/extract", extract)
-
-
-serve({
-  fetch: app.fetch,
-  port: 3000
-}, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`)
-})
+// Web server functionality
+export { createPipeline } from './server/index.js';
