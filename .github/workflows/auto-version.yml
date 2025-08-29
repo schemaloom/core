@@ -1,0 +1,88 @@
+name: Auto Version and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  version-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build package
+        run: npm run build
+        
+      - name: Check conventional commits
+        id: conventional
+        uses: actions/conventional-commits@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Version package
+        id: version
+        if: steps.conventional.outputs.skipped == 'false'
+        run: |
+          if [ "${{ steps.conventional.outputs.skipped }}" = "false" ]; then
+            npm version ${{ steps.conventional.outputs.releaseType }} --no-git-tag-version
+            echo "new_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Publish to NPM
+        if: steps.conventional.outputs.skipped == 'false'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create Git tag
+        if: steps.conventional.outputs.skipped == 'false'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
+          git tag v${{ steps.version.outputs.new_version }}
+          git push origin main
+          git push origin v${{ steps.version.outputs.new_version }}
+          
+      - name: Create GitHub Release
+        if: steps.conventional.outputs.skipped == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          release_name: Release v${{ steps.version.outputs.new_version }}
+          body: |
+            ## What's Changed
+            
+            This release includes:
+            - Automated version bump
+            - NPM package update
+            
+            ## Installation
+            
+            ```bash
+            npm install @schemaloom/core@${{ steps.version.outputs.new_version }}
+            ```
+          draft: false
+          prerelease: false
+          
+      - name: Skip (no conventional commits)
+        if: steps.conventional.outputs.skipped == 'true'
+        run: echo "No conventional commits found, skipping version bump and publish"

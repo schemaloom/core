@@ -1,7 +1,7 @@
 {
   "name": "schemaloom",
   "version": "1.0.0",
-  "description": "A TypeScript library for AI-powered data extraction and schema validation with built-in web server",
+  "description": "A TypeScript library for AI-powered data extraction and schema validation with integrated web server capabilities",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,7 +17,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
@@ -25,7 +27,8 @@
     "start": "node dist/server.js",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
@@ -42,6 +45,9 @@
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   },
+  "peerDependencies": {
+    "dotenv": "^17.2.1"
+  },
   "keywords": [
     "typescript",
     "ai",
@@ -51,12 +57,27 @@
     "langchain",
     "gemini",
     "web-server",
-    "api"
+    "api",
+    "nlp",
+    "machine-learning",
+    "data-processing",
+    "text-analysis",
+    "structured-data"
   ],
-  "author": "",
+  "author": "SchemaLoom Contributors",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/schemaloom/schemaloom.git"
+  },
+  "bugs": {
+    "url": "https://github.com/schemaloom/schemaloom/issues"
+  },
+  "homepage": "https://github.com/schemaloom/schemaloom#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,0 +1,49 @@
+name: Publish to NPM (Main Branch)
+
+on:
+  push:
+    branches:
+      - main  # Triggers on every push to main branch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build package
+        run: npm run build
+        
+      - name: Get version from package.json
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        
+      - name: Check if version exists on NPM
+        id: check-version
+        run: |
+          if npm view @schemaloom/core@${{ steps.package-version.outputs.version }} version >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Publish to NPM (if new version)
+        if: steps.check-version.outputs.exists == 'false'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Skip publish (version already exists)
+        if: steps.check-version.outputs.exists == 'true'
+        run: echo "Version ${{ steps.package-version.outputs.version }} already exists on NPM, skipping publish"
