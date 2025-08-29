@@ -1,0 +1,76 @@
+name: Simple Publish to NPM
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0, v1.1.0, etc.
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build package
+        run: npm run build
+        
+      - name: Get version from tag
+        id: get-version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "npm_version=${VERSION#v}" >> $GITHUB_OUTPUT
+          
+      - name: Update package.json version
+        run: npm version ${{ steps.get-version.outputs.npm_version }} --no-git-tag-version
+        
+      - name: Publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get-version.outputs.version }}
+          release_name: Release ${{ steps.get-version.outputs.version }}
+          body: |
+            ## SchemaLoom Core ${{ steps.get-version.outputs.npm_version }}
+            
+            ### Installation
+            
+            ```bash
+            npm install @schemaloom/core@${{ steps.get-version.outputs.npm_version }}
+            ```
+            
+            ### What's New
+            
+            This release includes the latest features and improvements to the SchemaLoom library.
+            
+            ### Features
+            
+            - AI-powered data extraction using Google Gemini
+            - Flexible schema validation with Zod
+            - Built-in web server capabilities
+            - TypeScript support with full type definitions
+            - Multiple predefined schemas
+            - Custom schema support
+            
+            ### Breaking Changes
+            
+            None in this release.
+          draft: false
+          prerelease: false

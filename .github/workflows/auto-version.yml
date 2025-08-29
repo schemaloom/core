@@ -25,32 +25,58 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
+      - name: Install conventional-changelog
+        run: npm install -g conventional-changelog-cli
+        
       - name: Build package
         run: npm run build
         
-      - name: Check conventional commits
-        id: conventional
-        uses: actions/conventional-commits@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check conventional commits and determine version
+        id: version-check
+        run: |
+          # Get the last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
+          
+          # Get commits since last tag
+          COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --format="%s")
+          echo "commits_since_tag<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Determine version bump type
+          if echo "$COMMITS" | grep -q "BREAKING CHANGE\|!:"; then
+            echo "bump_type=major" >> $GITHUB_OUTPUT
+            echo "should_bump=true" >> $GITHUB_OUTPUT
+          elif echo "$COMMITS" | grep -q "feat:"; then
+            echo "bump_type=minor" >> $GITHUB_OUTPUT
+            echo "should_bump=true" >> $GITHUB_OUTPUT
+          elif echo "$COMMITS" | grep -q "fix:\|chore:\|docs:\|style:\|refactor:\|perf:\|test:"; then
+            echo "bump_type=patch" >> $GITHUB_OUTPUT
+            echo "should_bump=true" >> $GITHUB_OUTPUT
+          else
+            echo "bump_type=none" >> $GITHUB_OUTPUT
+            echo "should_bump=false" >> $GITHUB_OUTPUT
+          fi
           
       - name: Version package
         id: version
-        if: steps.conventional.outputs.skipped == 'false'
+        if: steps.version-check.outputs.should_bump == 'true'
         run: |
-          if [ "${{ steps.conventional.outputs.skipped }}" = "false" ]; then
-            npm version ${{ steps.conventional.outputs.releaseType }} --no-git-tag-version
+          if [ "${{ steps.version-check.outputs.should_bump }}" = "true" ]; then
+            npm version ${{ steps.version-check.outputs.bump_type }} --no-git-tag-version
             echo "new_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+            echo "bump_type=${{ steps.version-check.outputs.bump_type }}" >> $GITHUB_OUTPUT
           fi
           
       - name: Publish to NPM
-        if: steps.conventional.outputs.skipped == 'false'
+        if: steps.version-check.outputs.should_bump == 'true'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
-      - name: Create Git tag
-        if: steps.conventional.outputs.skipped == 'false'
+      - name: Create Git tag and push
+        if: steps.version-check.outputs.should_bump == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -61,7 +87,7 @@ jobs:
           git push origin v${{ steps.version.outputs.new_version }}
           
       - name: Create GitHub Release
-        if: steps.conventional.outputs.skipped == 'false'
+        if: steps.version-check.outputs.should_bump == 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -71,18 +97,29 @@ jobs:
           body: |
             ## What's Changed
             
-            This release includes:
-            - Automated version bump
-            - NPM package update
+            This release includes a **${{ steps.version.outputs.bump_type }}** version bump.
+            
+            ### Version: ${{ steps.version.outputs.new_version }}
+            ### Bump Type: ${{ steps.version.outputs.bump_type }}
             
             ## Installation
             
             ```bash
             npm install @schemaloom/core@${{ steps.version.outputs.new_version }}
             ```
+            
+            ## Commits Since Last Release
+            
+            ```
+            ${{ steps.version-check.outputs.commits_since_tag }}
+            ```
           draft: false
           prerelease: false
           
       - name: Skip (no conventional commits)
-        if: steps.conventional.outputs.skipped == 'true'
-        run: echo "No conventional commits found, skipping version bump and publish"
+        if: steps.version-check.outputs.should_bump == 'false'
+        run: |
+          echo "No conventional commits found, skipping version bump and publish"
+          echo "Last tag: ${{ steps.version-check.outputs.last_tag }}"
+          echo "Commits since last tag:"
+          echo "${{ steps.version-check.outputs.commits_since_tag }}"
