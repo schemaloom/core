@@ -1,3 +1,4 @@
+![NPM Version](https://img.shields.io/npm/v/%40schemaloom%2Fcore)
 # SchemaLoom
 
 A TypeScript library for AI-powered data extraction and schema validation with integrated web server capabilities.
