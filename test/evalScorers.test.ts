@@ -1,5 +1,3 @@
-import { test } from "node:test";
-import assert from "node:assert/strict";
 import { findNode, matchConcepts, normalize } from "../eval/src/scorers/matching.js";
 import { conceptRecall, edgeRecall } from "../eval/src/scorers/recall.js";
 import { extracted, grounding, sizeInRange, structure } from "../eval/src/scorers/structure.js";
@@ -45,139 +43,139 @@ const good: ConceptGraph = {
 // ------------------------------------------------------------ normalize
 
 test("normalize: case, punctuation, curly quotes, plurals", () => {
-  assert.equal(normalize("  Neural-Networks! "), "neural network");
-  assert.equal(normalize("Newton’s Laws"), "newton law");
-  assert.equal(normalize("TCP/IP"), "tcp ip");
+  expect(normalize("  Neural-Networks! ")).toBe("neural network");
+  expect(normalize("Newton’s Laws")).toBe("newton law");
+  expect(normalize("TCP/IP")).toBe("tcp ip");
 });
 
 test("normalize: leaves stems that merely end in s", () => {
-  assert.equal(normalize("calculus"), "calculus");
-  assert.equal(normalize("analysis"), "analysis");
-  assert.equal(normalize("class"), "class");
-  assert.equal(normalize("vs"), "vs");
+  expect(normalize("calculus")).toBe("calculus");
+  expect(normalize("analysis")).toBe("analysis");
+  expect(normalize("class")).toBe("class");
+  expect(normalize("vs")).toBe("vs");
 });
 
 // ------------------------------------------------------------ matching
 
 test("findNode: exact, plural and alias", () => {
   const g: ConceptGraph = { nodes: [node("a", "Derivatives"), node("b", "Differentiation")], edges: [] };
-  assert.equal(findNode(g, { name: "derivative", aliases: [] })?.id, "a");
-  assert.equal(findNode(g, { name: "derivative", aliases: ["differentiation"] })?.id, "a"); // first match wins
-  assert.equal(findNode({ nodes: [node("b", "Differentiation")], edges: [] }, { name: "derivative", aliases: ["differentiation"] })?.id, "b");
+  expect(findNode(g, { name: "derivative", aliases: [] })?.id).toBe("a");
+  expect(findNode(g, { name: "derivative", aliases: ["differentiation"] })?.id).toBe("a"); // first match wins
+  expect(findNode({ nodes: [node("b", "Differentiation")], edges: [] }, { name: "derivative", aliases: ["differentiation"] })?.id).toBe("b");
 });
 
 test("findNode: label containing the concept matches, on word boundaries only", () => {
   const concept = { name: "calculus", aliases: [] };
-  assert.equal(findNode({ nodes: [node("a", "Differential Calculus")], edges: [] }, concept)?.id, "a");
-  assert.equal(findNode({ nodes: [node("a", "Precalculus")], edges: [] }, concept), undefined);
+  expect(findNode({ nodes: [node("a", "Differential Calculus")], edges: [] }, concept)?.id).toBe("a");
+  expect(findNode({ nodes: [node("a", "Precalculus")], edges: [] }, concept)).toBe(undefined);
 });
 
 test("findNode: a bare generic label does not satisfy a longer concept", () => {
-  assert.equal(findNode({ nodes: [node("a", "Network")], edges: [] }, { name: "neural network", aliases: [] }), undefined);
+  expect(findNode({ nodes: [node("a", "Network")], edges: [] }, { name: "neural network", aliases: [] })).toBe(undefined);
   // but a multi-word label inside a longer concept does
-  assert.equal(findNode({ nodes: [node("a", "Neural Network")], edges: [] }, { name: "artificial neural network", aliases: [] })?.id, "a");
+  expect(findNode({ nodes: [node("a", "Neural Network")], edges: [] }, { name: "artificial neural network", aliases: [] })?.id).toBe("a");
 });
 
 test("matchConcepts: one node cannot satisfy two concepts; exact beats loose", () => {
   const g: ConceptGraph = { nodes: [node("m", "Cell membrane")], edges: [] };
   const m = matchConcepts(g, [{ name: "cell", aliases: [] }, { name: "cell membrane", aliases: [] }]);
-  assert.equal(m.get("cell membrane")?.id, "m");
-  assert.equal(m.get("cell"), undefined); // would be a false positive if nodes could be reused
+  expect(m.get("cell membrane")?.id).toBe("m");
+  expect(m.get("cell")).toBe(undefined); // would be a false positive if nodes could be reused
   const g2: ConceptGraph = { nodes: [node("m", "Cell membrane"), node("c", "Cell")], edges: [] };
   const m2 = matchConcepts(g2, [{ name: "cell", aliases: [] }, { name: "cell membrane", aliases: [] }]);
-  assert.equal(m2.get("cell")?.id, "c");
+  expect(m2.get("cell")?.id).toBe("c");
 });
 
 test("matching: short acronym aliases only match whole words", () => {
   const concept = { name: "Internet Protocol", aliases: ["IP"] };
-  assert.equal(findNode({ nodes: [node("a", "Description")], edges: [] }, concept), undefined);
-  assert.equal(findNode({ nodes: [node("a", "IP")], edges: [] }, concept)?.id, "a");
+  expect(findNode({ nodes: [node("a", "Description")], edges: [] }, concept)).toBe(undefined);
+  expect(findNode({ nodes: [node("a", "IP")], edges: [] }, concept)?.id).toBe("a");
 });
 
 // ------------------------------------------------------------ recall scorers
 
 test("conceptRecall: all found passes", () => {
   const s = conceptRecall(out(good), c);
-  assert.equal(s.value, 1);
-  assert.equal(s.pass, true);
-  assert.equal(s.gate, true);
+  expect(s.value).toBe(1);
+  expect(s.pass).toBe(true);
+  expect(s.gate).toBe(true);
 });
 
 test("conceptRecall: 4/5 is exactly at the threshold, 3/5 fails", () => {
   const drop = (...ids: string[]): ConceptGraph => ({ nodes: good.nodes.filter((n) => !ids.includes(n.id)), edges: [] });
   const four = conceptRecall(out(drop("ftc")), c);
-  assert.equal(four.value, 0.8);
-  assert.equal(four.pass, true);
-  assert.deepEqual(four.details?.missing, ["fundamental theorem of calculus"]);
-  assert.equal(conceptRecall(out(drop("ftc", "limit")), c).pass, false);
+  expect(four.value).toBe(0.8);
+  expect(four.pass).toBe(true);
+  expect(four.details?.missing).toEqual(["fundamental theorem of calculus"]);
+  expect(conceptRecall(out(drop("ftc", "limit")), c).pass).toBe(false);
 });
 
 test("conceptRecall: null graph scores 0", () => {
   const s = conceptRecall(out(null), c);
-  assert.equal(s.value, 0);
-  assert.equal(s.pass, false);
+  expect(s.value).toBe(0);
+  expect(s.pass).toBe(false);
 });
 
 test("edgeRecall: found, reversed, wrong relation, missing endpoint", () => {
-  assert.equal(edgeRecall(out(good), c).value, 1);
+  expect(edgeRecall(out(good), c).value).toBe(1);
 
   const reversed: ConceptGraph = { ...good, edges: [edge("calculus", "diff"), edge("limit", "calculus", "prerequisite_of")] };
   const r = edgeRecall(out(reversed), c);
-  assert.equal(r.value, 0.5);
-  assert.equal(r.details?.reversed, 1);
+  expect(r.value).toBe(0.5);
+  expect(r.details?.reversed).toBe(1);
 
   const wrongRel: ConceptGraph = { ...good, edges: [edge("diff", "calculus", "prerequisite_of"), edge("limit", "calculus", "prerequisite_of")] };
   const w = edgeRecall(out(wrongRel), c);
-  assert.equal(w.details?.wrongRelation, 1);
-  assert.equal(w.details?.found, 1);
+  expect(w.details?.wrongRelation).toBe(1);
+  expect(w.details?.found).toBe(1);
 
   const noLimit: ConceptGraph = { nodes: good.nodes.filter((n) => n.id !== "limit"), edges: [edge("diff", "calculus")] };
   const m = edgeRecall(out(noLimit), c);
-  assert.equal(m.value, 0.5);
-  assert.equal(m.details?.missing, 1);
+  expect(m.value).toBe(0.5);
+  expect(m.details?.missing).toBe(1);
 });
 
 test("edgeRecall is not a gate", () => {
-  assert.equal(edgeRecall(out(good), c).gate, false);
+  expect(edgeRecall(out(good), c).gate).toBe(false);
 });
 
 // ------------------------------------------------------------ structure scorers
 
 test("extracted: null and malformed graphs fail", () => {
-  assert.equal(extracted(out(good)).pass, true);
-  assert.equal(extracted(out(null)).pass, false);
-  assert.equal(extracted(out({ nodes: "x" } as unknown as ConceptGraph)).pass, false);
+  expect(extracted(out(good)).pass).toBe(true);
+  expect(extracted(out(null)).pass).toBe(false);
+  expect(extracted(out({ nodes: "x" } as unknown as ConceptGraph)).pass).toBe(false);
 });
 
 test("structure: a cycle fails it, listing the issue type", () => {
   const cyc: ConceptGraph = { ...good, edges: [edge("diff", "int", "prerequisite_of"), edge("int", "diff", "prerequisite_of")] };
   const s = structure(out(cyc), c);
-  assert.equal(s.pass, false);
-  assert.deepEqual(s.details?.issueTypes, ["cycle"]);
+  expect(s.pass).toBe(false);
+  expect(s.details?.issueTypes).toEqual(["cycle"]);
 });
 
 test("structure ignores ungrounded nodes; grounding scores them separately", () => {
   const bad: ConceptGraph = { ...good, nodes: good.nodes.map((n) => ({ ...n, sourceQuote: "not in the text at all" })) };
-  assert.equal(structure(out(bad), c).pass, true);
+  expect(structure(out(bad), c).pass).toBe(true);
   const g = grounding(out(bad), c);
-  assert.equal(g.value, 0);
-  assert.equal(g.pass, false);
-  assert.equal(grounding(out(good), c).pass, true);
+  expect(g.value).toBe(0);
+  expect(g.pass).toBe(false);
+  expect(grounding(out(good), c).pass).toBe(true);
 });
 
 test("sizeInRange", () => {
-  assert.equal(sizeInRange(out(good), c).pass, true);
-  assert.equal(sizeInRange(out({ nodes: [], edges: [] }), c).pass, false);
-  assert.equal(sizeInRange(out(null), c).pass, false);
+  expect(sizeInRange(out(good), c).pass).toBe(true);
+  expect(sizeInRange(out({ nodes: [], edges: [] }), c).pass).toBe(false);
+  expect(sizeInRange(out(null), c).pass).toBe(false);
 });
 
 test("scoreTrial: a trial passes only if every gate passes; non-gates don't count", () => {
   const scores = scoreTrial(out(good), c);
-  assert.equal(trialPasses(scores), true);
+  expect(trialPasses(scores)).toBe(true);
   // break only a non-gate metric (edges reversed) -> still passes
   const rev: ConceptGraph = { ...good, edges: [edge("calculus", "diff")] };
-  assert.equal(trialPasses(scoreTrial(out(rev), c)), true);
-  assert.equal(trialPasses(scoreTrial(out(null), c)), false);
+  expect(trialPasses(scoreTrial(out(rev), c))).toBe(true);
+  expect(trialPasses(scoreTrial(out(null), c))).toBe(false);
 });
 
 // ------------------------------------------------------------ runner / report
@@ -186,19 +184,19 @@ const cfg: RunConfig = { model: "m", temperature: 0, retries: 0, repeats: 2, con
 
 test("runTrial: a throwing target becomes a failed result, not a crash", async () => {
   const r = await runTrial(c, 0, cfg, async () => { throw new Error("boom"); });
-  assert.equal(r.pass, false);
-  assert.equal(r.output.error, "boom");
-  assert.equal(r.output.attempts, 0);
+  expect(r.pass).toBe(false);
+  expect(r.output.error).toBe("boom");
+  expect(r.output.attempts).toBe(0);
 });
 
 test("runTrial: timeout becomes a failed result", async () => {
   const r = await runTrial(c, 0, cfg, () => new Promise(() => {}));
-  assert.equal(r.pass, false);
-  assert.match(r.output.error!, /timeout/);
+  expect(r.pass).toBe(false);
+  expect(r.output.error!).toMatch(/timeout/);
 });
 
 test("withTimeout passes through fast results", async () => {
-  assert.equal(await withTimeout(Promise.resolve(7), 50), 7);
+  expect(await withTimeout(Promise.resolve(7), 50)).toBe(7);
 });
 
 test("summarize: pass rate, consistency, failures by type", async () => {
@@ -207,36 +205,36 @@ test("summarize: pass rate, consistency, failures by type", async () => {
   const bad = await runTrial({ ...c, id: "u" }, 0, cfg, async () => out(null, { error: "timeout after 5ms" }));
   const good2 = await runTrial({ ...c, id: "u" }, 1, cfg, async () => out(good));
   const s = summarize([ok, ok2, bad, good2], [c, { ...c, id: "u" }]);
-  assert.equal(s.trials, 4);
-  assert.equal(s.passRate, 0.75);
-  assert.equal(s.consistentCases, 1);
-  assert.equal(s.failuresByScorer.extracted, 1);
-  assert.equal(s.failuresByIssue.timeout, 1);
-  assert.equal(s.byCase.u.passRate, 0.5);
-  assert.equal(s.byTag.x.trials, 4);
+  expect(s.trials).toBe(4);
+  expect(s.passRate).toBe(0.75);
+  expect(s.consistentCases).toBe(1);
+  expect(s.failuresByScorer.extracted).toBe(1);
+  expect(s.failuresByIssue.timeout).toBe(1);
+  expect(s.byCase.u.passRate).toBe(0.5);
+  expect(s.byTag.x.trials).toBe(4);
 });
 
 test("percentile (nearest rank)", () => {
-  assert.equal(percentile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 50), 5);
-  assert.equal(percentile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 95), 10);
-  assert.equal(percentile([], 50), 0);
+  expect(percentile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 50)).toBe(5);
+  expect(percentile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 95)).toBe(10);
+  expect(percentile([], 50)).toBe(0);
 });
 
 test("rescore: re-applies current scorers to stored outputs and skips unknown cases", async () => {
   const t = await runTrial(c, 0, cfg, async () => out(good));
   const stale = { ...t, pass: false, scores: [] };
   const { trials, skipped } = rescore([stale, { ...stale, caseId: "gone" }], [c]);
-  assert.equal(trials.length, 1);
-  assert.equal(trials[0].pass, true);
-  assert.deepEqual(skipped, ["gone"]);
+  expect(trials.length).toBe(1);
+  expect(trials[0].pass).toBe(true);
+  expect(skipped).toEqual(["gone"]);
 });
 
 // ------------------------------------------------------------ dataset
 
 test("every committed case file loads, validates, and splits as designed", () => {
   const cases = loadCases();
-  assert.ok(cases.length >= 15 && cases.length <= 20, `expected 15-20 cases, got ${cases.length}`);
-  assert.ok(selectCases(cases, "dev").length >= 10);
-  assert.ok(selectCases(cases, "test").length >= 5);
-  for (const k of cases) assert.ok(k.expect.concepts.length >= 3, k.id);
+  expect(cases.length >= 15 && cases.length <= 20).toBeTruthy();
+  expect(selectCases(cases, "dev").length >= 10).toBeTruthy();
+  expect(selectCases(cases, "test").length >= 5).toBeTruthy();
+  for (const k of cases) expect(k.expect.concepts.length >= 3).toBeTruthy();
 });

@@ -3,7 +3,7 @@ import { GeminiProvider } from "../../src/extraction/providers/gemini.js";
 import { ConceptGraphSchema, type ConceptGraph } from "../../src/schemas/conceptGraphSchema.js";
 import { SchemaHooks } from "../../src/schemas/index.js";
 import { createPipeline } from "../../src/server/index.js";
-import type { RunConfig, TargetOutput } from "./types.js";
+import type { EvalCase, RunConfig, TargetOutput } from "./types.js";
 
 export type Target = (text: string, cfg: RunConfig) => Promise<TargetOutput>;
 
@@ -57,4 +57,36 @@ export const apiTarget: Target = async (text, cfg) => {
   };
 };
 
-export const targets: Record<RunConfig["target"], Target> = { library: libraryTarget, api: apiTarget };
+/**
+ * Deterministic oracle: builds the graph straight from a case's expectations, no
+ * model and no API key. It should score ~perfect, so it exercises the harness
+ * (loading, runner, scorers, report, cache) end to end and doubles as a CI smoke
+ * test. A failing stub run means the harness is broken, not the model.
+ */
+const stubCases = new Map<string, EvalCase>();
+export const registerStubCases = (cases: EvalCase[]) => cases.forEach((c) => stubCases.set(c.text, c));
+
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+
+export const stubTarget: Target = async (text) => {
+  const start = Date.now();
+  const c = stubCases.get(text);
+  if (!c) throw new Error("stub target: unknown input text (call registerStubCases first)");
+  const lower = text.toLowerCase();
+  const nodes = c.expect.concepts.map((k) => {
+    const phrase = [k.name, ...k.aliases].find((p) => lower.includes(p.toLowerCase())) ?? k.name;
+    const i = lower.indexOf(phrase.toLowerCase());
+    return {
+      id: slug(k.name), label: k.name, description: `About ${k.name}.`,
+      sourceQuote: i >= 0 ? text.slice(i, i + phrase.length) : phrase,
+    };
+  });
+  const ids = new Map(c.expect.concepts.map((k) => [k.name.toLowerCase(), slug(k.name)]));
+  const edges = c.expect.edges.flatMap((e) => {
+    const from = ids.get(e.from.toLowerCase()), to = ids.get(e.to.toLowerCase());
+    return from && to ? [{ from, to, relation: e.relation }] : [];
+  });
+  return { graph: { nodes, edges }, latencyMs: Date.now() - start, attempts: 1 };
+};
+
+export const targets: Record<RunConfig["target"], Target> = { library: libraryTarget, api: apiTarget, stub: stubTarget };

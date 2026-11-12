@@ -15,7 +15,7 @@ SchemaLoom provides a robust framework for extracting structured data from unstr
 - **Multiple Interfaces**: Use as a library or deploy as a web service
 - **Type Safety**: Full TypeScript support with comprehensive type definitions
 - **Extensible Architecture**: Support for custom schemas and extraction logic
-- **Production Ready**: Built-in error handling, validation, and monitoring
+- **Validation & Error Handling**: Per-chunk error reporting and post-extraction graph validation
 
 ## Installation
 

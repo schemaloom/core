@@ -34,7 +34,7 @@ export interface RunConfig {
   concurrency: number;
   timeoutMs: number;
   split: "dev" | "test" | "all";
-  target: "library" | "api";
+  target: "library" | "api" | "stub";
   useCache: boolean;
   /** Restrict to these case ids (empty = all in split). */
   caseIds: string[];

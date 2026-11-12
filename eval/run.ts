@@ -6,7 +6,7 @@ import { parseArgs } from "node:util";
 import { loadCases, selectCases } from "./src/dataset.js";
 import { buildRecord, formatConsole, formatMarkdown } from "./src/report.js";
 import { rescore, runEval } from "./src/runner.js";
-import { targets } from "./src/targets.js";
+import { registerStubCases, targets } from "./src/targets.js";
 import type { RunConfig, RunRecord } from "./src/types.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -69,16 +69,17 @@ async function main() {
     concurrency: num("concurrency", v.concurrency!),
     timeoutMs: num("timeout", v.timeout!),
     split: oneOf("split", v.split!, ["dev", "test", "all"] as const),
-    target: oneOf("target", v.target!, ["library", "api"] as const),
+    target: oneOf("target", v.target!, ["library", "api", "stub"] as const),
     useCache: !v["no-cache"],
     caseIds: v.case ?? [],
   };
   const cases = selectCases(all, cfg.split, cfg.caseIds);
   if (!cases.length) throw new Error("No cases selected");
-  if (!process.env.GOOGLE_API_KEY && !process.env.GEMINI_API_KEY) {
+  if (cfg.target !== "stub" && !process.env.GOOGLE_API_KEY && !process.env.GEMINI_API_KEY) {
     console.warn("Warning: no GOOGLE_API_KEY in the environment; uncached trials will fail.");
   }
 
+  if (cfg.target === "stub") registerStubCases(cases);
   console.log(`Running ${cases.length} cases x ${cfg.repeats} repeats (${cfg.target}, ${cfg.model}, cache ${cfg.useCache ? "on" : "off"})`);
   let done = 0;
   const total = cases.length * cfg.repeats;
