@@ -1,0 +1,47 @@
+{
+  "id": "relational-database",
+  "split": "dev",
+  "tags": [
+    "databases",
+    "very-short",
+    "technical"
+  ],
+  "articlePath": "articles/relational-database.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "relational database",
+        "aliases": [
+          "RDB"
+        ]
+      },
+      {
+        "name": "relational model",
+        "aliases": []
+      },
+      {
+        "name": "SQL",
+        "aliases": [
+          "Structured Query Language"
+        ]
+      },
+      {
+        "name": "relational database management system",
+        "aliases": [
+          "RDBMS"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "relational model",
+        "to": "relational database",
+        "relation": "prerequisite_of"
+      }
+    ],
+    "nodeCountRange": [
+      3,
+      12
+    ]
+  }
+}

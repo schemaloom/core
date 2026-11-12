@@ -1,0 +1,71 @@
+{
+  "id": "cell",
+  "split": "dev",
+  "tags": [
+    "biology",
+    "medium",
+    "general"
+  ],
+  "articlePath": "articles/cell.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "cell",
+        "aliases": [
+          "biological cell"
+        ]
+      },
+      {
+        "name": "cell membrane",
+        "aliases": [
+          "plasma membrane"
+        ]
+      },
+      {
+        "name": "prokaryote",
+        "aliases": [
+          "prokaryotes",
+          "prokaryotic cell"
+        ]
+      },
+      {
+        "name": "eukaryote",
+        "aliases": [
+          "eukaryotes",
+          "eukaryotic cell"
+        ]
+      },
+      {
+        "name": "mitochondrion",
+        "aliases": [
+          "mitochondria"
+        ]
+      },
+      {
+        "name": "nucleus",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "cell membrane",
+        "to": "cell",
+        "relation": "part_of"
+      },
+      {
+        "from": "mitochondrion",
+        "to": "eukaryote",
+        "relation": "part_of"
+      },
+      {
+        "from": "nucleus",
+        "to": "eukaryote",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      30
+    ]
+  }
+}

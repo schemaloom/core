@@ -1,0 +1,63 @@
+{
+  "id": "natural-selection",
+  "split": "dev",
+  "tags": [
+    "biology",
+    "long",
+    "general"
+  ],
+  "articlePath": "articles/natural-selection.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "natural selection",
+        "aliases": []
+      },
+      {
+        "name": "evolution",
+        "aliases": []
+      },
+      {
+        "name": "variation",
+        "aliases": [
+          "variation of traits"
+        ]
+      },
+      {
+        "name": "inheritance",
+        "aliases": [
+          "heredity"
+        ]
+      },
+      {
+        "name": "fitness",
+        "aliases": []
+      },
+      {
+        "name": "sexual selection",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "inheritance",
+        "to": "natural selection",
+        "relation": "part_of"
+      },
+      {
+        "from": "variation",
+        "to": "natural selection",
+        "relation": "part_of"
+      },
+      {
+        "from": "natural selection",
+        "to": "evolution",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      30
+    ]
+  }
+}

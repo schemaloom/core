@@ -7,7 +7,7 @@ export { default as EventListSchema } from './schemas/eventSchema.js';
 export * from './schemas/index.js';
 
 // Main extraction class
-export { SchemaLoomExtractor } from './extraction/schemaLoomExtractor.js';
+export { SchemaLoomExtractor, PROMPT_VERSION } from './extraction/schemaLoomExtractor.js';
 
 // Types
 export type { ExtractionOptions, ExtractionResult, TextChunk, ExtractionProvider, ServerOptions } from './types/index.js';

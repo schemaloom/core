@@ -1,7 +1,13 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { z } from "zod";
-import type { ExtractionOptions, ExtractionResult, ExtractOptions, TextChunk } from "../types/index.js";
+import type { ExtractionOptions, ExtractionResult, ExtractOptions, TextChunk, TokenUsage } from "../types/index.js";
+
+/**
+ * Bump whenever the extraction prompt changes. The eval harness includes it in
+ * its cache key so stale cached model responses are never replayed.
+ */
+export const PROMPT_VERSION = "1";
 
 export class SchemaLoomExtractor {
   private promptTemplate: ChatPromptTemplate;
@@ -52,16 +58,21 @@ return null for the attribute's value.`,
       // Process each chunk
       const responseArr: T[] = [];
       const errors: string[] = [];
+      const usage: TokenUsage = { inputTokens: 0, outputTokens: 0 };
       
       for (let i = 0; i < splitContent.length; i++) {
         try {
           console.log(`Processing chunk ${i + 1}/${splitContent.length}: ${splitContent[i].substring(0, 100)}...`);
           
           const prompt = await this.promptTemplate.invoke({ text: splitContent[i] });
-          const structured_llm = provider.withStructuredOutput(schema);
-          const eventList = await structured_llm.invoke(prompt);
+          // includeRaw returns the raw message (which carries usage_metadata) alongside the parsed object
+          const structured_llm = provider.withStructuredOutput(schema, { includeRaw: true });
+          const { raw, parsed } = await structured_llm.invoke(prompt);
+          usage.inputTokens += raw?.usage_metadata?.input_tokens ?? 0;
+          usage.outputTokens += raw?.usage_metadata?.output_tokens ?? 0;
+          if (parsed == null) throw new Error("Model output did not match the schema");
           
-          responseArr.push(eventList);
+          responseArr.push(parsed);
         } catch (error) {
           const errorMsg = `Error processing chunk ${i + 1}: ${error instanceof Error ? error.message : String(error)}`;
           console.error(errorMsg);
@@ -84,7 +95,8 @@ return null for the attribute's value.`,
         validation,
         chunks: splitContent.length,
         processingTime: Date.now() - startTime,
-        errors: errors.length > 0 ? errors : undefined
+        errors: errors.length > 0 ? errors : undefined,
+        usage
       };
       
     } catch (error) {

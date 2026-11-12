@@ -159,6 +159,7 @@ extract.post("/", async (c) => {
         processingTime: result.processingTime,
         errors: result.errors,
         validation: result.validation,
+        usage: result.usage,
         schema: schemaName,
         options: {
           chunkSize,

@@ -29,7 +29,10 @@
     "test": "node --import tsx --test test/*.test.ts",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run build",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "eval": "tsx eval/run.ts",
+    "eval:compare": "tsx eval/compare.ts",
+    "typecheck:eval": "tsc -p eval/tsconfig.json"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
@@ -43,6 +46,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "p-limit": "^6.2.0",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   },

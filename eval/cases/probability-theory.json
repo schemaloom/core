@@ -1,0 +1,63 @@
+{
+  "id": "probability-theory",
+  "split": "test",
+  "tags": [
+    "math",
+    "short",
+    "technical"
+  ],
+  "articlePath": "articles/probability-theory.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "probability theory",
+        "aliases": [
+          "probability calculus"
+        ]
+      },
+      {
+        "name": "probability space",
+        "aliases": []
+      },
+      {
+        "name": "sample space",
+        "aliases": []
+      },
+      {
+        "name": "random variable",
+        "aliases": [
+          "random variables"
+        ]
+      },
+      {
+        "name": "central limit theorem",
+        "aliases": []
+      },
+      {
+        "name": "law of large numbers",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "sample space",
+        "to": "probability space",
+        "relation": "part_of"
+      },
+      {
+        "from": "random variable",
+        "to": "probability theory",
+        "relation": "part_of"
+      },
+      {
+        "from": "central limit theorem",
+        "to": "probability theory",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      25
+    ]
+  }
+}

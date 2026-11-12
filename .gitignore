@@ -89,3 +89,8 @@ jspm_packages/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Eval harness: cached model responses and local runs; only baselines are committed
+eval/.cache/
+eval/results/*
+!eval/results/baseline*.json

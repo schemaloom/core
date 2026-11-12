@@ -1,0 +1,67 @@
+{
+  "id": "tcp",
+  "split": "dev",
+  "tags": [
+    "networking",
+    "medium",
+    "technical"
+  ],
+  "articlePath": "articles/tcp.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "Transmission Control Protocol",
+        "aliases": [
+          "TCP"
+        ]
+      },
+      {
+        "name": "Internet protocol suite",
+        "aliases": [
+          "TCP/IP"
+        ]
+      },
+      {
+        "name": "Internet Protocol",
+        "aliases": [
+          "IP"
+        ]
+      },
+      {
+        "name": "User Datagram Protocol",
+        "aliases": [
+          "UDP"
+        ]
+      },
+      {
+        "name": "three-way handshake",
+        "aliases": []
+      },
+      {
+        "name": "transport layer",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "Transmission Control Protocol",
+        "to": "Internet protocol suite",
+        "relation": "part_of"
+      },
+      {
+        "from": "three-way handshake",
+        "to": "Transmission Control Protocol",
+        "relation": "part_of"
+      },
+      {
+        "from": "Transmission Control Protocol",
+        "to": "transport layer",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      25
+    ]
+  }
+}

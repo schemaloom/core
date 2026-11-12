@@ -342,6 +342,41 @@ import type {
 } from 'schemaloom';
 ```
 
+## Evaluation
+
+`eval/` measures how well the `conceptGraph` extraction works on a hand-labelled dataset. It is split the way Inspect AI / OpenAI Evals split things: **dataset** (`eval/cases`, `src/dataset.ts`), **task** (`src/targets.ts`, `src/runner.ts`) and **scorers** (`src/scorers/`, pure functions, no API calls).
+
+```bash
+npm run eval -- --split dev --repeats 3 --target library     # live run (needs GOOGLE_API_KEY)
+npm run eval -- --split test --repeats 3                     # final number; run sparingly
+npm run eval -- --target api                                 # through the Hono app in-process
+npm run eval -- --replay eval/results/<run>.json             # rescore stored outputs, no API calls
+npm run eval:compare -- eval/results/a.json eval/results/b.json
+```
+
+**Dataset.** 18 cases from Wikipedia intro sections (tags cover short/long, technical/general, plus harder list-heavy, formula-heavy and cross-reference-heavy texts): 12 `dev` cases to iterate on and 6 `test` cases reserved for the final number. Each case lists about 5-6 must-have concepts (with aliases), about 3 must-have edges, and a plausible node-count range. Expectations were written from the article text before any model output was seen, and they are deliberately minimal: they check that the important things appear, not that the graph equals one person's graph. Cases are validated with Zod at load time, including that every edge endpoint is a listed concept, so a typo fails loudly.
+
+**Pass definition.** A trial passes if every *gate* scorer passes:
+
+| Scorer | Gate | Passes when |
+|---|---|---|
+| `extracted` | yes | output exists and matches the schema |
+| `structure` | yes | `checkGraph` reports no error-severity issue (excluding grounding) |
+| `grounding` | yes | at least 80% of nodes have a verbatim `sourceQuote` |
+| `conceptRecall` | yes | at least 80% of expected concepts are found |
+| `edgeRecall` | no | tracked; also counts reversed and wrong-relation edges |
+| `sizeInRange`, `latency` | no | tracked |
+
+The 0.8 thresholds are starting points, not tuned values. Matching is deterministic: normalized label equals the concept name or an alias (exact matches are claimed first), or contains it on word boundaries. A node can satisfy only one expected concept, and a bare generic label such as "network" does not satisfy "neural network". The matching rules are covered by unit tests in `test/evalScorers.test.ts`.
+
+**Repeats.** Each case runs several times (default 3) because output varies even at temperature 0. Reports give the trial pass rate next to *consistency* (cases that passed every repeat).
+
+**Run records.** Every run writes `eval/results/<runId>.json` (config, git commit, dataset hash, prompt version, every raw output and score) and a Markdown report in `eval/reports/`. Model responses are cached in `eval/.cache/` keyed by input, trial, config and `PROMPT_VERSION`; bump `PROMPT_VERSION` in `src/extraction/schemaLoomExtractor.ts` whenever the prompt changes. Only `eval/results/baseline*.json` is committed.
+
+**Results.** No baseline has been recorded yet: the harness was built without API access. Numbers will be added here from committed `baseline*.json` runs; each is on at most 12 dev or 6 test cases, so one case moves the pass rate by 8 or 17 points, and small differences are noise.
+
+**Known limitations.** The dataset is small and written by one person. Very short articles (`relational-database`, 4 concepts) are strict under the 80% recall gate. `retries` is recorded in the config but not used until the extractor has a retry loop (`attempts` is always 1 until then). There is no LLM-as-judge by design; one would need to be validated against human labels first.
+
 ## Contributing
 
 1. Fork the repository

@@ -1,0 +1,64 @@
+{
+  "id": "linear-algebra",
+  "split": "dev",
+  "tags": [
+    "math",
+    "short",
+    "formula-heavy"
+  ],
+  "articlePath": "articles/linear-algebra.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "linear algebra",
+        "aliases": []
+      },
+      {
+        "name": "linear equation",
+        "aliases": [
+          "linear equations"
+        ]
+      },
+      {
+        "name": "linear map",
+        "aliases": [
+          "linear maps",
+          "linear transformation"
+        ]
+      },
+      {
+        "name": "vector space",
+        "aliases": [
+          "vector spaces"
+        ]
+      },
+      {
+        "name": "matrix",
+        "aliases": [
+          "matrices"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "linear equation",
+        "to": "linear algebra",
+        "relation": "part_of"
+      },
+      {
+        "from": "linear map",
+        "to": "linear algebra",
+        "relation": "part_of"
+      },
+      {
+        "from": "vector space",
+        "to": "linear algebra",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      5,
+      20
+    ]
+  }
+}

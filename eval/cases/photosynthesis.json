@@ -1,0 +1,67 @@
+{
+  "id": "photosynthesis",
+  "split": "dev",
+  "tags": [
+    "biology",
+    "long",
+    "technical"
+  ],
+  "articlePath": "articles/photosynthesis.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "photosynthesis",
+        "aliases": [
+          "oxygenic photosynthesis"
+        ]
+      },
+      {
+        "name": "light-dependent reactions",
+        "aliases": [
+          "light reactions"
+        ]
+      },
+      {
+        "name": "Calvin cycle",
+        "aliases": [
+          "light-independent reactions"
+        ]
+      },
+      {
+        "name": "chlorophyll",
+        "aliases": []
+      },
+      {
+        "name": "ATP",
+        "aliases": [
+          "adenosine triphosphate"
+        ]
+      },
+      {
+        "name": "chloroplast",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "light-dependent reactions",
+        "to": "Calvin cycle",
+        "relation": "prerequisite_of"
+      },
+      {
+        "from": "chlorophyll",
+        "to": "chloroplast",
+        "relation": "part_of"
+      },
+      {
+        "from": "Calvin cycle",
+        "to": "photosynthesis",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      8,
+      40
+    ]
+  }
+}

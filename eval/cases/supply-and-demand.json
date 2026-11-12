@@ -1,0 +1,54 @@
+{
+  "id": "supply-and-demand",
+  "split": "dev",
+  "tags": [
+    "economics",
+    "medium",
+    "general"
+  ],
+  "articlePath": "articles/supply-and-demand.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "supply and demand",
+        "aliases": []
+      },
+      {
+        "name": "market-clearing price",
+        "aliases": [
+          "equilibrium price"
+        ]
+      },
+      {
+        "name": "economic equilibrium",
+        "aliases": [
+          "equilibrium"
+        ]
+      },
+      {
+        "name": "perfect competition",
+        "aliases": []
+      },
+      {
+        "name": "market power",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "perfect competition",
+        "to": "supply and demand",
+        "relation": "prerequisite_of"
+      },
+      {
+        "from": "market-clearing price",
+        "to": "supply and demand",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      5,
+      25
+    ]
+  }
+}

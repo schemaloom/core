@@ -1,0 +1,60 @@
+{
+  "id": "inflation",
+  "split": "test",
+  "tags": [
+    "economics",
+    "medium",
+    "general",
+    "ambiguous-relations"
+  ],
+  "articlePath": "articles/inflation.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "inflation",
+        "aliases": []
+      },
+      {
+        "name": "price index",
+        "aliases": [
+          "consumer price index",
+          "cpi"
+        ]
+      },
+      {
+        "name": "purchasing power",
+        "aliases": []
+      },
+      {
+        "name": "money supply",
+        "aliases": []
+      },
+      {
+        "name": "central bank",
+        "aliases": [
+          "central banks"
+        ]
+      },
+      {
+        "name": "deflation",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "money supply",
+        "to": "inflation",
+        "relation": "prerequisite_of"
+      },
+      {
+        "from": "price index",
+        "to": "inflation",
+        "relation": "prerequisite_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      30
+    ]
+  }
+}

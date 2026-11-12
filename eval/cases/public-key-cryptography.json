@@ -1,0 +1,64 @@
+{
+  "id": "public-key-cryptography",
+  "split": "dev",
+  "tags": [
+    "security",
+    "short",
+    "technical"
+  ],
+  "articlePath": "articles/public-key-cryptography.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "public-key cryptography",
+        "aliases": [
+          "asymmetric cryptography",
+          "public key cryptography"
+        ]
+      },
+      {
+        "name": "public key",
+        "aliases": []
+      },
+      {
+        "name": "private key",
+        "aliases": []
+      },
+      {
+        "name": "key pair",
+        "aliases": []
+      },
+      {
+        "name": "digital signature",
+        "aliases": []
+      },
+      {
+        "name": "hybrid cryptosystem",
+        "aliases": [
+          "hybrid cryptosystems"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "public key",
+        "to": "key pair",
+        "relation": "part_of"
+      },
+      {
+        "from": "private key",
+        "to": "key pair",
+        "relation": "part_of"
+      },
+      {
+        "from": "digital signature",
+        "to": "public-key cryptography",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      5,
+      20
+    ]
+  }
+}

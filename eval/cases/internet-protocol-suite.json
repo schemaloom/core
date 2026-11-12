@@ -1,0 +1,67 @@
+{
+  "id": "internet-protocol-suite",
+  "split": "test",
+  "tags": [
+    "networking",
+    "long",
+    "technical",
+    "hard",
+    "cross-references"
+  ],
+  "articlePath": "articles/internet-protocol-suite.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "Internet protocol suite",
+        "aliases": [
+          "TCP/IP"
+        ]
+      },
+      {
+        "name": "Transmission Control Protocol",
+        "aliases": [
+          "TCP"
+        ]
+      },
+      {
+        "name": "Internet Protocol",
+        "aliases": [
+          "IP"
+        ]
+      },
+      {
+        "name": "transport layer",
+        "aliases": []
+      },
+      {
+        "name": "link layer",
+        "aliases": []
+      },
+      {
+        "name": "ARPANET",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "link layer",
+        "to": "Internet protocol suite",
+        "relation": "part_of"
+      },
+      {
+        "from": "transport layer",
+        "to": "Internet protocol suite",
+        "relation": "part_of"
+      },
+      {
+        "from": "Transmission Control Protocol",
+        "to": "Internet protocol suite",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      8,
+      60
+    ]
+  }
+}

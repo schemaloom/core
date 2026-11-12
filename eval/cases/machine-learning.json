@@ -1,0 +1,69 @@
+{
+  "id": "machine-learning",
+  "split": "test",
+  "tags": [
+    "ml",
+    "short",
+    "general"
+  ],
+  "articlePath": "articles/machine-learning.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "machine learning",
+        "aliases": [
+          "ml"
+        ]
+      },
+      {
+        "name": "artificial intelligence",
+        "aliases": [
+          "ai"
+        ]
+      },
+      {
+        "name": "statistics",
+        "aliases": []
+      },
+      {
+        "name": "mathematical optimisation",
+        "aliases": [
+          "mathematical optimization",
+          "optimisation",
+          "optimization"
+        ]
+      },
+      {
+        "name": "deep learning",
+        "aliases": []
+      },
+      {
+        "name": "neural network",
+        "aliases": [
+          "neural networks"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "machine learning",
+        "to": "artificial intelligence",
+        "relation": "part_of"
+      },
+      {
+        "from": "statistics",
+        "to": "machine learning",
+        "relation": "prerequisite_of"
+      },
+      {
+        "from": "mathematical optimisation",
+        "to": "machine learning",
+        "relation": "prerequisite_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      20
+    ]
+  }
+}

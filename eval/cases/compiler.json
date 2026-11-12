@@ -1,0 +1,65 @@
+{
+  "id": "compiler",
+  "split": "test",
+  "tags": [
+    "computing",
+    "medium",
+    "technical"
+  ],
+  "articlePath": "articles/compiler.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "compiler",
+        "aliases": [
+          "compilers"
+        ]
+      },
+      {
+        "name": "programming language",
+        "aliases": [
+          "programming languages"
+        ]
+      },
+      {
+        "name": "machine code",
+        "aliases": []
+      },
+      {
+        "name": "lexical analysis",
+        "aliases": []
+      },
+      {
+        "name": "parsing",
+        "aliases": []
+      },
+      {
+        "name": "code optimization",
+        "aliases": [
+          "code optimisation"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "lexical analysis",
+        "to": "compiler",
+        "relation": "part_of"
+      },
+      {
+        "from": "parsing",
+        "to": "compiler",
+        "relation": "part_of"
+      },
+      {
+        "from": "lexical analysis",
+        "to": "parsing",
+        "relation": "prerequisite_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      30
+    ]
+  }
+}

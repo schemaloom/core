@@ -1,0 +1,67 @@
+{
+  "id": "cellular-respiration",
+  "split": "test",
+  "tags": [
+    "biology",
+    "medium",
+    "technical"
+  ],
+  "articlePath": "articles/cellular-respiration.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "cellular respiration",
+        "aliases": [
+          "respiration"
+        ]
+      },
+      {
+        "name": "ATP",
+        "aliases": [
+          "adenosine triphosphate"
+        ]
+      },
+      {
+        "name": "aerobic cellular respiration",
+        "aliases": [
+          "aerobic respiration"
+        ]
+      },
+      {
+        "name": "anaerobic cellular respiration",
+        "aliases": [
+          "anaerobic respiration"
+        ]
+      },
+      {
+        "name": "fermentation",
+        "aliases": []
+      },
+      {
+        "name": "electron acceptor",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "aerobic cellular respiration",
+        "to": "cellular respiration",
+        "relation": "part_of"
+      },
+      {
+        "from": "anaerobic cellular respiration",
+        "to": "cellular respiration",
+        "relation": "part_of"
+      },
+      {
+        "from": "electron acceptor",
+        "to": "cellular respiration",
+        "relation": "prerequisite_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      25
+    ]
+  }
+}

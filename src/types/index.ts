@@ -30,12 +30,19 @@ export interface ExtractOptions<T> {
   merge?: (parts: T[]) => T;
 }
 
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+}
+
 export interface ExtractionResult<T = any> {
   data: T;
   chunks: number;
   processingTime: number;
   errors?: string[];
   validation?: ValidationResult;
+  /** Summed over all chunks; absent for providers that don't report usage. */
+  usage?: TokenUsage;
 }
 
 export interface TextChunk {

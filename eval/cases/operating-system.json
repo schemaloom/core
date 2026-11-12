@@ -1,0 +1,66 @@
+{
+  "id": "operating-system",
+  "split": "dev",
+  "tags": [
+    "computing",
+    "long",
+    "list-heavy",
+    "hard"
+  ],
+  "articlePath": "articles/operating-system.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "operating system",
+        "aliases": [
+          "OS"
+        ]
+      },
+      {
+        "name": "kernel",
+        "aliases": []
+      },
+      {
+        "name": "virtual memory",
+        "aliases": []
+      },
+      {
+        "name": "real-time operating system",
+        "aliases": [
+          "real-time systems"
+        ]
+      },
+      {
+        "name": "middleware",
+        "aliases": []
+      },
+      {
+        "name": "distributed system",
+        "aliases": [
+          "distributed systems"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "kernel",
+        "to": "operating system",
+        "relation": "part_of"
+      },
+      {
+        "from": "virtual memory",
+        "to": "operating system",
+        "relation": "part_of"
+      },
+      {
+        "from": "middleware",
+        "to": "distributed system",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      45
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "id": "neural-networks",
+  "split": "dev",
+  "tags": [
+    "ml",
+    "medium",
+    "technical"
+  ],
+  "articlePath": "articles/neural-networks.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "neural network",
+        "aliases": [
+          "artificial neural network",
+          "neural net",
+          "ann"
+        ]
+      },
+      {
+        "name": "artificial neuron",
+        "aliases": [
+          "neuron",
+          "node"
+        ]
+      },
+      {
+        "name": "weight",
+        "aliases": [
+          "weights"
+        ]
+      },
+      {
+        "name": "activation function",
+        "aliases": []
+      },
+      {
+        "name": "layer",
+        "aliases": [
+          "layers"
+        ]
+      },
+      {
+        "name": "deep neural network",
+        "aliases": [
+          "deep learning"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "artificial neuron",
+        "to": "neural network",
+        "relation": "part_of"
+      },
+      {
+        "from": "layer",
+        "to": "neural network",
+        "relation": "part_of"
+      },
+      {
+        "from": "activation function",
+        "to": "artificial neuron",
+        "relation": "part_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      30
+    ]
+  }
+}

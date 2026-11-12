@@ -1,0 +1,63 @@
+{
+  "id": "calculus",
+  "split": "dev",
+  "tags": [
+    "math",
+    "short",
+    "technical"
+  ],
+  "articlePath": "articles/calculus.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "calculus",
+        "aliases": [
+          "infinitesimal calculus"
+        ]
+      },
+      {
+        "name": "differential calculus",
+        "aliases": [
+          "differentiation"
+        ]
+      },
+      {
+        "name": "integral calculus",
+        "aliases": [
+          "integration"
+        ]
+      },
+      {
+        "name": "fundamental theorem of calculus",
+        "aliases": []
+      },
+      {
+        "name": "limit",
+        "aliases": [
+          "limits"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "differential calculus",
+        "to": "calculus",
+        "relation": "part_of"
+      },
+      {
+        "from": "integral calculus",
+        "to": "calculus",
+        "relation": "part_of"
+      },
+      {
+        "from": "limit",
+        "to": "calculus",
+        "relation": "prerequisite_of"
+      }
+    ],
+    "nodeCountRange": [
+      5,
+      20
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "plate-tectonics",
+  "split": "dev",
+  "tags": [
+    "geology",
+    "long",
+    "technical"
+  ],
+  "articlePath": "articles/plate-tectonics.txt",
+  "expect": {
+    "concepts": [
+      {
+        "name": "plate tectonics",
+        "aliases": []
+      },
+      {
+        "name": "lithosphere",
+        "aliases": []
+      },
+      {
+        "name": "tectonic plate",
+        "aliases": [
+          "tectonic plates",
+          "plates"
+        ]
+      },
+      {
+        "name": "subduction",
+        "aliases": []
+      },
+      {
+        "name": "seafloor spreading",
+        "aliases": [
+          "sea floor spreading"
+        ]
+      },
+      {
+        "name": "continental drift",
+        "aliases": []
+      }
+    ],
+    "edges": [
+      {
+        "from": "continental drift",
+        "to": "plate tectonics",
+        "relation": "prerequisite_of"
+      },
+      {
+        "from": "tectonic plate",
+        "to": "lithosphere",
+        "relation": "part_of"
+      },
+      {
+        "from": "seafloor spreading",
+        "to": "plate tectonics",
+        "relation": "prerequisite_of"
+      }
+    ],
+    "nodeCountRange": [
+      6,
+      35
+    ]
+  }
+}

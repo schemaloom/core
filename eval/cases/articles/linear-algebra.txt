@@ -1,0 +1,8 @@
+Linear algebra is the branch of mathematics concerning linear equations such as
+a1x1+⋯+anxn=b,
+linear maps such as the following:
+(x1,…,xn)↦a1x1+⋯+anxn,
+and their representations in vector spaces and through matrices.
+
+Linear algebra is central to almost all areas of mathematics. For instance, linear algebra is fundamental in modern presentations of geometry, including for defining basic objects such as lines, planes and rotations. Also, functional analysis, a branch of mathematical analysis, may be viewed as the application of linear algebra to function spaces.
+Linear algebra is also used in most sciences and fields of engineering, because linear structures are natural models for many physical phenomena; it's also useful in many areas of computing, and is thus applied to most sciences. For nonlinear systems, linear algebra is often used for dealing with first-order approximations: the derivative of a manifold at a point gives the slope of a line which models the manifold's local behavior, and can itself be analyzed with linear algebra.
