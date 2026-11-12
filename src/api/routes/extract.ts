@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { SchemaLoomExtractor } from "../../extraction/schemaLoomExtractor.js";
 import { SchemaRegistry } from "../../schemas/index.js";
-import GeminiProvider from "../../extraction/providers/gemini.js";
+import { GeminiProvider } from "../../extraction/providers/gemini.js";
 import type { ExtractionOptions } from "../../types/index.js";
 import { z } from "zod";
 
@@ -139,8 +139,8 @@ extract.post("/", async (c) => {
       model
     });
 
-    // Use the default provider instance
-    const provider = GeminiProvider;
+    // Create a per-request provider so temperature/model actually reach the LLM
+    const provider = new GeminiProvider({ temperature, model });
 
     // Extract data using the schema
     const result = await extractor.extract(
@@ -243,8 +243,8 @@ extract.post("/custom", async (c) => {
       model
     });
 
-    // Use the default provider instance
-    const provider = GeminiProvider;
+    // Create a per-request provider so temperature/model actually reach the LLM
+    const provider = new GeminiProvider({ temperature, model });
 
     // Extract data using the custom schema
     const result = await extractor.extract(
