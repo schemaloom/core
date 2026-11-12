@@ -26,6 +26,7 @@
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "clean": "rm -rf dist",
+    "test": "node --import tsx --test test/*.test.ts",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run build",
     "prepack": "npm run build"

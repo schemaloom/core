@@ -1,5 +1,12 @@
 import EventListSchema from './eventSchema.js';
 import { z } from 'zod';
+import { ConceptGraphSchema } from './conceptGraphSchema.js';
+import type { ConceptGraph } from './conceptGraphSchema.js';
+import { checkGraph } from '../validation/graphChecks.js';
+import { mergeGraphs } from '../validation/mergeGraphs.js';
+import type { ExtractOptions } from '../types/index.js';
+
+export * from './conceptGraphSchema.js';
 
 // Product schema for e-commerce applications
 export const ProductSchema = z.object({
@@ -68,8 +75,18 @@ export const SchemaRegistry = {
   product: ProductListSchema,
   article: ArticleListSchema,
   contact: ContactListSchema,
-  invoice: InvoiceListSchema
+  invoice: InvoiceListSchema,
+  conceptGraph: ConceptGraphSchema
 } as const;
+
+// Optional per-schema hooks (post-validation and chunk merging).
+// Schemas without an entry keep the default behavior.
+export const SchemaHooks: { [K in SchemaName]?: ExtractOptions<any> } = {
+  conceptGraph: {
+    postValidate: (data: ConceptGraph, sourceText: string) => checkGraph(data, sourceText),
+    merge: (parts: ConceptGraph[]) => mergeGraphs(parts)
+  } satisfies ExtractOptions<ConceptGraph>
+};
 
 export type SchemaName = keyof typeof SchemaRegistry;
 export type AvailableSchemas = typeof SchemaRegistry;

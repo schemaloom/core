@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { SchemaLoomExtractor } from "../../extraction/schemaLoomExtractor.js";
-import { SchemaRegistry } from "../../schemas/index.js";
+import { SchemaRegistry, SchemaHooks } from "../../schemas/index.js";
 import { GeminiProvider } from "../../extraction/providers/gemini.js";
 import type { ExtractionOptions } from "../../types/index.js";
 import { z } from "zod";
@@ -104,7 +104,7 @@ extract.post("/", async (c) => {
 
     // Handle custom schema if provided
     let schema: z.ZodSchema = SchemaRegistry.event;
-    let schemaName = "event";
+    let schemaName: keyof typeof SchemaRegistry = "event";
     
     if (body.schema) {
       try {
@@ -113,7 +113,7 @@ extract.post("/", async (c) => {
           const schemaKey = body.schema as keyof typeof SchemaRegistry;
           if (SchemaRegistry[schemaKey]) {
             schema = SchemaRegistry[schemaKey];
-            schemaName = body.schema;
+            schemaName = schemaKey;
           } else {
             return c.json({
               success: false,
@@ -146,7 +146,8 @@ extract.post("/", async (c) => {
     const result = await extractor.extract(
       content,
       schema,
-      provider.getLLM()
+      provider.getLLM(),
+      SchemaHooks[schemaName]
     );
 
     // Return the extracted data with metadata
@@ -157,6 +158,7 @@ extract.post("/", async (c) => {
         chunks: result.chunks,
         processingTime: result.processingTime,
         errors: result.errors,
+        validation: result.validation,
         schema: schemaName,
         options: {
           chunkSize,

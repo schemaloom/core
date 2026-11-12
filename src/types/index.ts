@@ -7,11 +7,35 @@ export interface ExtractionOptions {
   model?: string;
 }
 
+export interface ValidationIssue {
+  type: string;
+  severity: "error" | "warning";
+  /** Written so it can be sent back to the model in a retry prompt. */
+  message: string;
+  ids: string[];
+}
+
+export interface ValidationResult {
+  /** true if there are no error-severity issues */
+  valid: boolean;
+  issues: ValidationIssue[];
+  stats?: Record<string, number>;
+}
+
+/** Optional per-schema hooks; schemas that don't need them pass nothing. */
+export interface ExtractOptions<T> {
+  /** Whole-result validation that Zod can't express. Runs after merging. */
+  postValidate?: (data: T, sourceText: string) => ValidationResult;
+  /** Combine per-chunk results. Defaults to Array.prototype.flat(). */
+  merge?: (parts: T[]) => T;
+}
+
 export interface ExtractionResult<T = any> {
   data: T;
   chunks: number;
   processingTime: number;
   errors?: string[];
+  validation?: ValidationResult;
 }
 
 export interface TextChunk {

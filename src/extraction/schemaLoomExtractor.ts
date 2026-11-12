@@ -1,7 +1,7 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { z } from "zod";
-import type { ExtractionOptions, ExtractionResult, TextChunk } from "../types/index.js";
+import type { ExtractionOptions, ExtractionResult, ExtractOptions, TextChunk } from "../types/index.js";
 
 export class SchemaLoomExtractor {
   private promptTemplate: ChatPromptTemplate;
@@ -40,7 +40,8 @@ return null for the attribute's value.`,
   async extract<T>(
     text: string, 
     schema: z.ZodSchema<T>,
-    provider: any
+    provider: any,
+    hooks: ExtractOptions<T> = {}
   ): Promise<ExtractionResult<T>> {
     const startTime = Date.now();
     
@@ -68,11 +69,19 @@ return null for the attribute's value.`,
         }
       }
 
-      // Combine results
-      const combinedData = responseArr.flat() as T;
+      // Combine results (schema-specific merge, or flatten arrays by default)
+      const combinedData = hooks.merge
+        ? hooks.merge(responseArr)
+        : (responseArr.flat() as T);
+
+      // Whole-result validation runs on the merged data against the full text
+      const validation = hooks.postValidate
+        ? hooks.postValidate(combinedData, text)
+        : undefined;
       
       return {
         data: combinedData,
+        validation,
         chunks: splitContent.length,
         processingTime: Date.now() - startTime,
         errors: errors.length > 0 ? errors : undefined
