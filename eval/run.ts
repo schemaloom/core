@@ -17,7 +17,7 @@ const { values: v } = parseArgs({
     repeats: { type: "string", default: "3" },
     retries: { type: "string", default: "0" },
     target: { type: "string", default: "library" },
-    model: { type: "string", default: "gemini-2.5-flash" },
+    model: { type: "string", default: "gemini-3-flash-preview" },
     temperature: { type: "string", default: "0" },
     concurrency: { type: "string", default: "3" },
     timeout: { type: "string", default: "120000" },

@@ -78,7 +78,7 @@ extract.post("/", async (c) => {
     const chunkSize = parseInt(c.req.query('chunkSize') || String(body.chunkSize || '100000'));
     const chunkOverlap = parseInt(c.req.query('chunkOverlap') || String(body.chunkOverlap || '0'));
     const temperature = parseFloat(c.req.query('temperature') || String(body.temperature || '0'));
-    const model = c.req.query('model') || String(body.model || 'gemini-2.5-flash');
+    const model = c.req.query('model') || String(body.model || 'gemini-3-flash-preview');
 
     // Validate parameters
     if (chunkSize < 1000 || chunkSize > 1000000) {
@@ -203,7 +203,7 @@ extract.post("/custom", async (c) => {
     const chunkSize = parseInt(options.chunkSize || '100000');
     const chunkOverlap = parseInt(options.chunkOverlap || '0');
     const temperature = parseFloat(options.temperature || '0');
-    const model = options.model || 'gemini-2.5-flash';
+    const model = options.model || 'gemini-3-flash-preview';
 
     // Validate parameters
     if (chunkSize < 1000 || chunkSize > 1000000) {
@@ -295,7 +295,7 @@ extract.get("/", (c) => {
       chunkSize: "Number (1000-1000000, default: 100000) - Size of text chunks",
       chunkOverlap: "Number (0 to < chunkSize, default: 0) - Overlap between chunks",
       temperature: "Number (0-2, default: 0) - AI model creativity/randomness",
-      model: "String (default: gemini-2.5-flash) - AI model to use",
+      model: "String (default: gemini-3-flash-preview) - AI model to use",
       schema: `String (default: event) - Predefined schema to use. Available: ${Object.keys(SchemaRegistry).join(', ')}`
     },
     examples: {

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Graph Viewer</title>
+<style>
+  :root { --bg:#fff; --fg:#1a1a1a; --mute:#666; --edge:#999; --node:#4f7cff; --line:#ddd; --panel:#f6f6f8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#16171a; --fg:#eee; --mute:#9a9a9a; --edge:#6a6a6a; --node:#7b9cff; --line:#333; --panel:#1f2024; }
+  }
+  * { box-sizing:border-box }
+  body { margin:0; font:14px system-ui,sans-serif; background:var(--bg); color:var(--fg); display:flex; flex-direction:column; height:100vh }
+  header { display:flex; gap:12px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap }
+  select,input,button { font:inherit; padding:4px 8px; background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:6px }
+  main { flex:1; display:flex; min-height:0 }
+  svg { flex:1; min-width:0; cursor:grab }
+  aside { width:300px; border-left:1px solid var(--line); padding:12px 16px; overflow:auto; background:var(--panel) }
+  aside h3 { margin:0 0 4px } aside p { color:var(--mute); margin:6px 0 }
+  .hint { color:var(--mute) }
+  .edge { stroke:var(--edge); stroke-width:1.2; fill:none }
+  .elabel { fill:var(--mute); font-size:10px; text-anchor:middle; paint-order:stroke; stroke:var(--bg); stroke-width:3px }
+  .node circle { fill:var(--node); stroke:var(--bg); stroke-width:2 }
+  .node text { fill:var(--fg); font-size:12px; paint-order:stroke; stroke:var(--bg); stroke-width:3px }
+  .node.sel circle { stroke:var(--fg) }
+</style>
+</head>
+<body>
+<header>
+  <input type="file" id="file" accept=".json">
+  <select id="trial" disabled></select>
+  <span id="stats" class="hint">Choose a results JSON (or drop one on the page)</span>
+</header>
+<main>
+  <svg id="svg"><defs><marker id="arr" viewBox="0 -5 10 10" refX="22" refY="0" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,-4L10,0L0,4" fill="#999"/></marker></defs><g id="vp"></g></svg>
+  <aside id="side"><p class="hint">Click a node or edge for details. Drag nodes, scroll to zoom.</p></aside>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+let run = null, sim = null;
+const $ = id => document.getElementById(id);
+const svg = d3.select('#svg'), vp = d3.select('#vp');
+svg.call(d3.zoom().scaleExtent([0.1, 4]).on('zoom', e => vp.attr('transform', e.transform)));
+
+function load(text) {
+  run = JSON.parse(text);
+  const sel = $('trial'); sel.innerHTML = '';
+  run.trials.forEach((t, i) => {
+    if (!t.output || !t.output.graph) return;
+    const o = document.createElement('option');
+    o.value = i; o.textContent = `${t.caseId} #${t.trial}${t.pass === false ? ' ✗' : t.pass ? ' ✓' : ''}`;
+    sel.appendChild(o);
+  });
+  sel.disabled = !sel.options.length;
+  if (sel.options.length) draw(+sel.value);
+}
+
+function draw(i) {
+  const g = run.trials[i].output.graph;
+  const nodes = g.nodes.map(n => ({ ...n }));
+  const ids = new Set(nodes.map(n => n.id));
+  const links = g.edges.filter(e => ids.has(e.from) && ids.has(e.to)).map(e => ({ ...e, source: e.from, target: e.to }));
+  const dangling = g.edges.length - links.length;
+  $('stats').textContent = `${nodes.length} nodes, ${links.length} edges` + (dangling ? `, ${dangling} dangling edges skipped` : '');
+  vp.selectAll('*').remove();
+  if (sim) sim.stop();
+
+  const link = vp.append('g').selectAll('path').data(links).join('path').attr('class', 'edge').attr('marker-end', 'url(#arr)')
+    .on('click', (_, d) => showEdge(d));
+  const elab = vp.append('g').selectAll('text').data(links).join('text').attr('class', 'elabel').text(d => d.relation);
+  const node = vp.append('g').selectAll('g').data(nodes).join('g').attr('class', 'node')
+    .call(d3.drag().on('start', (e, d) => { if (!e.active) sim.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = d.fy = null; }))
+    .on('click', (_, d) => { node.classed('sel', n => n === d); showNode(d); });
+  node.append('circle').attr('r', 9);
+  node.append('text').attr('x', 13).attr('y', 4).text(d => d.label || d.id);
+
+  const r = $('svg').getBoundingClientRect();
+  sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(110))
+    .force('charge', d3.forceManyBody().strength(-350))
+    .force('center', d3.forceCenter(r.width / 2, r.height / 2))
+    .force('collide', d3.forceCollide(30))
+    .on('tick', () => {
+      link.attr('d', d => `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`);
+      elab.attr('x', d => (d.source.x + d.target.x) / 2).attr('y', d => (d.source.y + d.target.y) / 2);
+      node.attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+}
+
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+function showNode(d) {
+  $('side').innerHTML = `<h3>${esc(d.label || d.id)}</h3><p class="hint">${esc(d.id)}</p><p>${esc(d.description)}</p>` +
+    (d.sourceQuote ? `<p><em>"${esc(d.sourceQuote)}"</em></p>` : '');
+}
+function showEdge(d) {
+  $('side').innerHTML = `<h3>${esc(d.relation)}</h3><p>${esc(d.from)} → ${esc(d.to)}</p>` +
+    Object.entries(d).filter(([k]) => !['from', 'to', 'relation', 'source', 'target', 'index'].includes(k))
+      .map(([k, v]) => `<p><b>${esc(k)}</b>: ${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</p>`).join('');
+}
+
+$('file').onchange = e => e.target.files[0]?.text().then(load);
+$('trial').onchange = e => draw(+e.target.value);
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => { e.preventDefault(); e.dataTransfer.files[0]?.text().then(load); });
+</script>
+</body>
+</html>

@@ -19,7 +19,7 @@ export class SchemaLoomExtractor {
       chunkSize: 100000,
       chunkOverlap: 0,
       temperature: 0,
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       ...options
     };
 

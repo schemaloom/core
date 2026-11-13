@@ -39,7 +39,7 @@ const extractor = new SchemaLoomExtractor({
 
 // Configure AI provider
 const provider = new GeminiProvider({
-  model: "gemini-2.5-flash",
+  model: "gemini-3-flash-preview",
   temperature: 0
 });
 
@@ -79,7 +79,7 @@ interface ExtractionOptions {
   chunkSize?: number;        // Default: 100000
   chunkOverlap?: number;     // Default: 0
   temperature?: number;       // Default: 0
-  model?: string;            // Default: "gemini-2.5-flash"
+  model?: string;            // Default: "gemini-3-flash-preview"
 }
 ```
 
@@ -98,7 +98,7 @@ Manages Google Gemini AI model interactions with configurable parameters.
 
 ```typescript
 interface GeminiOptions {
-  model?: string;            // Default: "gemini-2.5-flash"
+  model?: string;            // Default: "gemini-3-flash-preview"
   temperature?: number;       // Default: 0
 }
 ```

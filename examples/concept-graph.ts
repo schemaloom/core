@@ -8,7 +8,7 @@ const text = `Calculus is the mathematical study of continuous change, in the sa
 
 async function main() {
   const extractor = new SchemaLoomExtractor({ temperature: 0 });
-  const provider = new GeminiProvider({ model: "gemini-2.5-flash", temperature: 0 });
+  const provider = new GeminiProvider({ model: "gemini-3-flash-preview", temperature: 0 });
 
   const result = await extractor.extract(
     text,

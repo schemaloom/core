@@ -10,7 +10,7 @@ async function main() {
 
   // Create a provider instance
   const provider = new GeminiProvider({
-    model: "gemini-2.5-flash",
+    model: "gemini-3-flash-preview",
     temperature: 0
   });
 

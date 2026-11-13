@@ -7,7 +7,7 @@ export class GeminiProvider {
   private currentTemperature: number;
 
   constructor(options: Partial<ExtractionOptions> = {}) {
-    this.currentModel = options.model || "gemini-2.5-flash";
+    this.currentModel = options.model || "gemini-3-flash-preview";
     this.currentTemperature = options.temperature || 0;
   }
 
@@ -19,6 +19,8 @@ export class GeminiProvider {
       this.llm = new ChatGoogleGenerativeAI({
         model: this.currentModel,
         temperature: this.currentTemperature,
+        // Fail fast on 503/429 instead of silently retrying until the caller times out
+        maxRetries: 2,
       });
     }
     return this.llm;
